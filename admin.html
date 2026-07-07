@@ -64,12 +64,9 @@
 
         <div class="field">
           <label>Product photo</label>
-          <div class="img-preview" id="imgPreview">No photo selected</div>
-          <label class="file-input-btn">
-            📷 Choose photo
-            <input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="onImageSelected(event)">
-          </label>
-          <div class="hint-text">JPG or PNG, up to 5MB. Stored securely in Firebase Storage.</div>
+          <div class="img-preview" id="imgPreview">No photo yet</div>
+          <input id="imgUrlInput" placeholder="Paste image link (e.g. from imgur.com)" oninput="onImageUrlInput()">
+          <div class="hint-text">Upload the photo to a free image host like <a href="https://imgur.com/upload" target="_blank" rel="noopener">imgur.com</a> (no account needed), then right-click the uploaded image → "Copy image address" → paste that link here.</div>
         </div>
 
         <div class="field">
@@ -140,7 +137,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="admin.js"></script>
 <script>
