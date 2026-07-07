@@ -3,10 +3,6 @@ rules_version = '2';
 // =========================================================
 // Javedan Online Shop — Firestore Security Rules
 //
-// HOW TO USE:
-// Firebase Console → Firestore Database → Rules tab → paste this
-// entire file in, replacing what's there → Publish.
-//
 // HOW IT WORKS:
 // - Anyone (customers, no login needed) can READ products & categories,
 //   and CREATE orders (placing an order doesn't require an account).
@@ -26,7 +22,7 @@ service cloud.firestore {
         request.auth.token.email in [
           // ADD YOUR REAL ADMIN EMAIL(S) HERE, e.g.:
           // "owner@javedanshop.com",
-          "REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com"
+          "fatima.sharifi@auw.edu.bd"
         ];
     }
 
