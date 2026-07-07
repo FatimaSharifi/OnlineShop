@@ -14,7 +14,6 @@ const NAMED_COLOR_OPTIONS = [
 let PRODUCTS = [];
 let CATEGORIES = [];
 let editingProductId = null;
-let selectedImageFile = null;
 
 function escapeHtml(s){ const d=document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }
 
@@ -145,30 +144,15 @@ function setAdminTab(tab){
 function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
 
 /* ============================================================
-   PRODUCT IMAGE HANDLING
+   PRODUCT IMAGE HANDLING (manual image URL — no file upload)
    ============================================================ */
-function onImageSelected(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  if(file.size > 5*1024*1024){
-    showToast('Image is too large — please choose one under 5MB');
-    e.target.value = '';
-    return;
-  }
-  selectedImageFile = file;
-  const reader = new FileReader();
-  reader.onload = (ev)=>{
-    document.getElementById('imgPreview').innerHTML = `<img src="${ev.target.result}" alt="preview">`;
-  };
-  reader.readAsDataURL(file);
+function onImageUrlInput(){
+  const url = document.getElementById('imgUrlInput').value.trim();
+  const preview = document.getElementById('imgPreview');
+  if(!url){ preview.innerHTML = 'No photo yet'; return; }
+  preview.innerHTML = `<img src="${url}" alt="preview" onerror="this.parentElement.innerHTML='Could not load that link — check it points directly to an image'">`;
 }
-async function uploadImageIfNeeded(){
-  if(!selectedImageFile) return null;
-  const filename = `products/${Date.now()}_${selectedImageFile.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
-  const ref = storage.ref().child(filename);
-  await ref.put(selectedImageFile);
-  return await ref.getDownloadURL();
-}
+
 
 /* ============================================================
    COLOR FIELD (named list + "Other")
@@ -193,7 +177,6 @@ function getChosenColorName(){
    ============================================================ */
 function resetItemForm(){
   editingProductId = null;
-  selectedImageFile = null;
   document.getElementById('itemName').value='';
   document.getElementById('itemPrice').value='';
   document.getElementById('itemDesc').value='';
@@ -201,9 +184,9 @@ function resetItemForm(){
   document.getElementById('otherColorWrap').style.display='none';
   document.getElementById('newCategoryWrap').style.display='none';
   document.getElementById('quickNewCategoryInline').value='';
-  document.getElementById('imgPreview').innerHTML = 'No photo selected';
+  document.getElementById('imgPreview').innerHTML = 'No photo yet';
   document.getElementById('itemColor').value = NAMED_COLOR_OPTIONS[0];
-  document.getElementById('imgFileInput').value='';
+  document.getElementById('imgUrlInput').value='';
   document.getElementById('formTitle').textContent = 'Add a new item';
   document.getElementById('saveItemBtn').textContent = 'Add to collection';
   document.getElementById('cancelEditBtn').style.display = 'none';
@@ -243,20 +226,16 @@ async function saveItem(){
       document.getElementById('itemCategory').value = category;
     }
 
-    let imageUrl = null;
-    if(selectedImageFile){
-      imageUrl = await uploadImageIfNeeded();
-    }
+    const imageUrl = document.getElementById('imgUrlInput').value.trim() || null;
 
     if(editingProductId){
-      const updateData = {name, category, price, colorName, desc};
-      if(imageUrl) updateData.imageUrl = imageUrl;
+      const updateData = {name, category, price, colorName, desc, imageUrl};
       await db.collection('products').doc(editingProductId).update(updateData);
       showToast('Item updated');
     } else {
       await db.collection('products').add({
         name, category, price, colorName, desc,
-        imageUrl: imageUrl || null,
+        imageUrl,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
       showToast('Item added to collection');
@@ -277,7 +256,6 @@ function editItem(id){
   const p = PRODUCTS.find(pp=>pp.id===id);
   if(!p) return;
   editingProductId = id;
-  selectedImageFile = null;
   document.getElementById('itemName').value = p.name;
   document.getElementById('itemPrice').value = p.price;
   document.getElementById('itemDesc').value = p.desc || '';
@@ -290,7 +268,8 @@ function editItem(id){
   document.getElementById('itemColor').value = isNamed ? NAMED_COLOR_OPTIONS.find(c=>c.toLowerCase()===p.colorName.toLowerCase()) : '__other__';
   document.getElementById('otherColorWrap').style.display = isNamed ? 'none' : '';
   document.getElementById('otherColorInput').value = isNamed ? '' : (p.colorName||'');
-  document.getElementById('imgPreview').innerHTML = p.imageUrl ? `<img src="${p.imageUrl}" alt="">` : 'No photo selected';
+  document.getElementById('imgUrlInput').value = p.imageUrl || '';
+  document.getElementById('imgPreview').innerHTML = p.imageUrl ? `<img src="${p.imageUrl}" alt="">` : 'No photo yet';
   document.getElementById('formTitle').textContent = 'Edit item';
   document.getElementById('saveItemBtn').textContent = 'Save changes';
   document.getElementById('cancelEditBtn').style.display = '';
