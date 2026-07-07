@@ -18,7 +18,7 @@ live, step by step. No coding experience required — just careful copy/pasting.
 - **`js/shop.js`** — storefront logic (browsing, cart, checkout)
 - **`js/admin.js`** — admin logic (login, orders, products, categories)
 - **`js/firebase-config.js`** — where you paste your Firebase project keys
-- **`firestore.rules`** / **`storage.rules`** — the real security layer (see below)
+- **`firestore.rules`** — the real security layer (see below)
 
 ### Why Firebase?
 
@@ -32,7 +32,7 @@ tools — which is exactly what's in this folder.
 
 Security here is **real**, not cosmetic: your admin password is checked by
 Google's servers (Firebase Authentication), and the rules in
-`firestore.rules` / `storage.rules` are enforced on Google's servers too — a
+`firestore.rules` is enforced on Google's servers too — a
 customer's browser can never bypass them, no matter what they try.
 
 ---
@@ -76,19 +76,24 @@ customer's browser can never bypass them, no matter what they try.
    request.auth.token.email in ["owner@example.com", "manager@example.com"]
    ```
 
-## Part 4 — Turn on Storage (product photos)
+## Part 4 — Product photos (no Firebase Storage needed)
 
-1. Left sidebar → **Build → Storage → Get started** → choose Production mode
-   → same location as Firestore → Done.
-2. Go to the **Rules** tab, delete what's there, paste in the contents of
-   **`storage.rules`** from this project.
-3. Again replace `"REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com"` with the real
-   admin email. Click **Publish**.
+This project does **not** use Firebase Storage for photos — Google now requires
+a billing-enabled ("Blaze") plan even for the free Storage tier, which isn't
+worth the friction for a shop this size. Instead, product photos work by
+**pasting a direct image link**:
 
-*(If your Firebase project asks you to upgrade to the "Blaze" pay-as-you-go
-plan to enable Storage — this is normal for newer projects. Blaze still has
-a generous free monthly allowance; a small shop's photo uploads will not
-incur charges under normal use.)*
+1. Go to **https://imgur.com/upload** (no account needed) and upload the photo.
+2. Right-click the uploaded image → **Copy image address**.
+3. Paste that link into the **Product photo** field when adding an item in
+   the admin panel.
+
+Any other free image host works the same way (a public Google Drive/Photos
+share link, etc.) as long as the link points directly to the image file.
+
+If you'd rather have a one-click upload button instead of this manual step,
+that's possible later by enabling Firebase Storage on the Blaze plan — ask
+if you'd like that switched back on.
 
 ## Part 5 — Put in your real config
 
@@ -181,5 +186,4 @@ there's no surprise cutoff.
 - **Change colors/fonts/branding**: edit the `:root` variables at the top of
   `css/style.css`.
 - **Add a second admin**: Firebase console → Authentication → add a user,
-  then add their email to both `firestore.rules` and `storage.rules` and
-  re-publish.
+  then add their email in `firestore.rules` and re-publish.
