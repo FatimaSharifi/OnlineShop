@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// =========================================================
+// Javedan Online Shop — Firebase Storage Security Rules
+//
+// HOW TO USE:
+// Firebase Console → Storage → Rules tab → paste this in → Publish.
+//
+// HOW IT WORKS:
+// - Anyone can VIEW product photos (needed so the storefront can
+//   display them to customers).
+// - Only a signed-in admin can UPLOAD or DELETE photos.
+// =========================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email in [
+          // ADD YOUR REAL ADMIN EMAIL(S) HERE — must match firestore.rules
+          "REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com"
+        ];
+    }
+
+    match /products/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin()
+                    && request.resource.size < 5 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

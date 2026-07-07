@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Admin — Javedan Online Shop</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">J</div>
+      <div class="brand-text">
+        <h1>Javedan</h1>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+    <div class="header-actions" id="headerActions" style="display:none;">
+      <span class="hint-text mono" id="adminEmailLabel" style="margin-right:4px;"></span>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </div>
+</header>
+
+<div class="admin-shell">
+
+  <!-- ===== LOGIN ===== -->
+  <div class="admin-login-wrap" id="adminLoginWrap">
+    <h3>Admin sign in</h3>
+    <p>Sign in with the admin email &amp; password created in Firebase Authentication.</p>
+    <div class="field" style="text-align:left;"><label>Email</label><input id="adminEmail" type="email" placeholder="admin@example.com"></div>
+    <div class="field" style="text-align:left;"><label>Password</label><input id="adminPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter') loginWithEmail()"></div>
+    <button class="btn-primary" id="loginBtn" style="width:100%" onclick="loginWithEmail()">Sign in</button>
+    <div class="err-text" id="loginErr" style="display:none;"></div>
+    <p class="hint-text" style="margin-top:16px;">Access is controlled entirely through Firebase Authentication and Firestore security rules — see README.md to create the admin account.</p>
+  </div>
+
+  <!-- ===== ADMIN PANEL ===== -->
+  <div id="adminPanel" style="display:none;">
+    <div class="admin-head">
+      <h2>Shop admin</h2>
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" id="tabOrders" onclick="setAdminTab('orders')">Orders</button>
+        <button class="admin-tab-btn" id="tabAdd" onclick="setAdminTab('add')">Items</button>
+        <button class="admin-tab-btn" id="tabCategories" onclick="setAdminTab('categories')">Categories</button>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div id="viewOrders">
+      <div class="stat-row" id="statRow"></div>
+      <div id="ordersList"></div>
+    </div>
+
+    <!-- ADD / MANAGE ITEMS TAB -->
+    <div id="viewAdd" style="display:none;">
+      <div class="admin-add-form" style="margin-bottom:30px;">
+        <h3 id="formTitle" style="font-size:22px; margin-bottom:18px;">Add a new item</h3>
+
+        <div class="field">
+          <label>Product photo</label>
+          <div class="img-preview" id="imgPreview">No photo selected</div>
+          <label class="file-input-btn">
+            📷 Choose photo
+            <input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="onImageSelected(event)">
+          </label>
+          <div class="hint-text">JPG or PNG, up to 5MB. Stored securely in Firebase Storage.</div>
+        </div>
+
+        <div class="field">
+          <label>Item name</label>
+          <input id="itemName" placeholder="e.g. Emerald Wool Long Coat">
+        </div>
+
+        <div class="field">
+          <label>Category</label>
+          <select id="itemCategory"></select>
+          <div id="newCategoryWrap" style="display:none; margin-top:8px;">
+            <input id="quickNewCategoryInline" placeholder="Type new category name">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Price (PKR)</label>
+            <input id="itemPrice" type="number" placeholder="4500">
+          </div>
+          <div class="field">
+            <label>Color</label>
+            <select id="itemColor"></select>
+            <div id="otherColorWrap" style="display:none;" class="other-color-input">
+              <input id="otherColorInput" placeholder="Type the color name (e.g. Dusty Rose)">
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Short description</label>
+          <textarea id="itemDesc" rows="3" placeholder="Fabric, fit, occasion..."></textarea>
+        </div>
+
+        <div id="itemFormErr" class="err-text" style="display:none;"></div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn-primary" id="saveItemBtn" style="flex:1;" onclick="saveItem()">Add to collection</button>
+          <button class="btn-ghost" id="cancelEditBtn" style="display:none;" onclick="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+
+      <h3 style="font-size:20px; margin-bottom:14px; font-style:italic;">Current collection</h3>
+      <div id="existingItemsList"></div>
+    </div>
+
+    <!-- CATEGORIES TAB -->
+    <div id="viewCategories" style="display:none;">
+      <div class="admin-add-form">
+        <h3 style="font-size:22px; margin-bottom:8px;">Categories</h3>
+        <p class="hint-text" style="margin-bottom:16px;">These appear as filters on the storefront and in the item form's category dropdown.</p>
+        <div class="cat-manage-list" id="catManageList"></div>
+        <div class="field-row" style="align-items:flex-end;">
+          <div class="field" style="margin-bottom:0;">
+            <label>New category name</label>
+            <input id="quickNewCategory" placeholder="e.g. Winter Shawls">
+          </div>
+          <button class="btn-primary" style="height:44px;" onclick="addCategoryQuick()">Add category</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs (compat build — simplest for plain HTML/JS, no build tools needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/admin.js"></script>
+<script>
+  auth.onAuthStateChanged(user=>{
+    document.getElementById('headerActions').style.display = user ? '' : 'none';
+  });
+</script>
+</body>
+</html>

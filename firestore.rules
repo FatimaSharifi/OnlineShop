@@ -1,0 +1,60 @@
+rules_version = '2';
+
+// =========================================================
+// Javedan Online Shop — Firestore Security Rules
+//
+// HOW TO USE:
+// Firebase Console → Firestore Database → Rules tab → paste this
+// entire file in, replacing what's there → Publish.
+//
+// HOW IT WORKS:
+// - Anyone (customers, no login needed) can READ products & categories,
+//   and CREATE orders (placing an order doesn't require an account).
+// - Only a signed-in admin can WRITE products/categories, and only a
+//   signed-in admin can READ or UPDATE orders (so customer data stays
+//   private, and only staff can change order status).
+// - Optional extra safety: list the exact admin email(s) allowed to
+//   write, so even if someone else ever signed in with Firebase Auth,
+//   they still could not touch your data. Edit the list below.
+// =========================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email in [
+          // ADD YOUR REAL ADMIN EMAIL(S) HERE, e.g.:
+          // "owner@javedanshop.com",
+          "REPLACE_WITH_YOUR_ADMIN_EMAIL@example.com"
+        ];
+    }
+
+    // Products: public read, admin-only write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Categories: public read, admin-only write
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders: anyone can place an order (create), but only the admin
+    // can read the list of orders or change their status.
+    match /orders/{orderId} {
+      allow create: if request.resource.data.keys().hasAll(
+                        ['customer','items','total','status','deliveryOption']
+                      )
+                      && request.resource.data.customer.keys().hasAll(
+                        ['name','phone','address','houseNo']
+                      )
+                      && request.resource.data.status == 'Pending'
+                      && request.resource.data.items is list
+                      && request.resource.data.items.size() > 0;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

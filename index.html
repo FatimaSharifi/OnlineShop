@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Javedan Online Shop — Women's Clothing, Quetta</title>
+<meta name="description" content="Javedan Online Shop — long coats, dresses, skirts, blazers and tops for women in Quetta. Order online with delivery to Quetta city and Hazara Town, or pick up in-shop.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">J</div>
+      <div class="brand-text">
+        <h1>Javedan</h1>
+        <span>Online Shop &middot; Quetta</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="cart-btn" onclick="openCart()">
+        🛍 Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="hero" id="heroSection">
+  <div>
+    <div class="hero-eyebrow">Women's Wear</div>
+    <h2>Grace, stitched <em>for you</em>.</h2>
+    <p class="lead">Long coats, layered dresses, tailored blazers and everyday tops — curated for the women of Quetta. Order online, or step into the shop.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="scrollToShop()">Browse the collection</button>
+      <button class="btn-ghost" onclick="openCart()">View cart</button>
+    </div>
+  </div>
+  <div class="hero-swatch">
+    <div class="tape">
+      <span>DELIVERY NOTES</span>
+      <span>QUETTA</span>
+    </div>
+    <div class="hero-swatch-row"><span>Quetta city &amp; Hazara Town</span><b>Rs. 200</b></div>
+    <div class="hero-swatch-row"><span>Orders above Rs. 5,000</span><b>Free delivery</b></div>
+    <div class="hero-swatch-row"><span>Prefer to collect it yourself?</span><b>Pickup available</b></div>
+  </div>
+</section>
+
+<div class="cat-strip" id="catStrip"></div>
+
+<main class="shop" id="shopMain">
+  <div class="section-head">
+    <h3 id="sectionTitle">The Collection</h3>
+    <span id="sectionCount"></span>
+  </div>
+  <div class="grid" id="productGrid"></div>
+</main>
+
+<footer>
+  Javedan Online Shop &middot; Quetta, Pakistan &middot; Women's clothing, delivered with care<br>
+  <a href="admin.html">Admin login</a>
+</footer>
+
+<!-- ============ CART DRAWER ============ -->
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h3>Your cart</h3>
+    <span class="close-x" onclick="closeCart()">&times;</span>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot" id="cartFoot"></div>
+</div>
+
+<!-- ============ CHECKOUT MODAL ============ -->
+<div class="modal-overlay" id="checkoutOverlay">
+  <div class="modal">
+    <span class="modal-close" onclick="closeCheckout()">&times;</span>
+    <div id="checkoutContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs (compat build — simplest for plain HTML/JS, no build tools needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/shop.js"></script>
+</body>
+</html>
